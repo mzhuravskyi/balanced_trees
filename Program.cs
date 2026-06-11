@@ -31,71 +31,71 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
     public TValue GetValue(TKey key)
     {
         Debug.Assert(root != null, "empty tree");
-        Node? curr = root;
+        Node? current = root;
     
-        while (curr != null)
+        while (current != null)
         {
-            int a = curr.key.CompareTo(key);
+            int a = current.key.CompareTo(key);
             if (a < 0)
             {
-                curr = curr.right;
+                current = current.right;
             }
             else if (a > 0)
             {
-                curr = curr.left;
+                current = current.left;
             }
             else
             {
-                return curr.value;
+                return current.value;
             }
         }
 
         throw new KeyNotFoundException($"{key} not found");
     }
-    // public TKey GetNextKey(TKey current_key);
+    // public TKey GetNextKey(TKey currentent_key);
     public TValue GetMaxValue(out TKey max_key)
     {
         Debug.Assert(root != null, "empty tree");
-        Node curr = root;
+        Node current = root;
 
-        while (curr.right != null) 
+        while (current.right != null) 
         {
-            curr = curr.right;
+            current = current.right;
         }
-        max_key = curr.key;
+        max_key = current.key;
 
-        return curr.value;
+        return current.value;
     }
     public TValue GetMinValue(out TKey min_key)
     {
         Debug.Assert(root != null, "empty tree");
-        Node curr = root;
+        Node current = root;
 
-        while(curr.left != null)
+        while(current.left != null)
         {
-            curr = curr.left;
+            current = current.left;
         }
-        min_key = curr.key;
+        min_key = current.key;
 
-        return curr.value;
+        return current.value;
     }
     public List<TKey> InOrderKeys()
     {
         Debug.Assert(root != null, "empty tree");
         List<TKey> keys = new List<TKey>();
         Stack<Node> stack = new Stack<Node>();
-        Node? curr = root;
+        Node? current = root;
 
-        while (curr != null || stack.Count > 0)
+        while (current != null || stack.Count > 0)
         {
-            while (curr != null)
+            while (current != null)
             {
-                stack.Push(curr);
-                curr = curr.left;
+                stack.Push(current);
+                current = current.left;
             }
-            curr = stack.Pop();
-            keys.Add(curr.key);
-            curr = curr.right;
+            current = stack.Pop();
+            keys.Add(current.key);
+            current = current.right;
         }
 
         return keys;
@@ -104,18 +104,18 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
         Debug.Assert(root != null, "empty tree");
         List<TValue> keys = new List<TValue>();
         Stack<Node> stack = new Stack<Node>();
-        Node? curr = root;
+        Node? current = root;
         
-        while (curr != null || stack.Count > 0)
+        while (current != null || stack.Count > 0)
         {
-            while (curr != null)
+            while (current != null)
             {
-                stack.Push(curr);
-                curr = curr.left;
+                stack.Push(current);
+                current = current.left;
             }
-            curr = stack.Pop();
-            keys.Add(curr.value);
-            curr = curr.right;
+            current = stack.Pop();
+            keys.Add(current.value);
+            current = current.right;
         }
 
         return keys;
@@ -124,18 +124,18 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
         Debug.Assert(root != null, "empty tree");
         List<(TKey, TValue)> kvps = new List<(TKey, TValue)>();
         Stack<Node> stack = new Stack<Node>();
-        Node? curr = root;
+        Node? current = root;
         
-        while (curr != null || stack.Count > 0)
+        while (current != null || stack.Count > 0)
         {
-            while (curr != null)
+            while (current != null)
             {
-                stack.Push(curr);
-                curr = curr.left;
+                stack.Push(current);
+                current = current.left;
             }
-            curr = stack.Pop();
-            kvps.Add((curr.key, curr.value));
-            curr = curr.right;
+            current = stack.Pop();
+            kvps.Add((current.key, current.value));
+            current = current.right;
         }
 
         return kvps;
