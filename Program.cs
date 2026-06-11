@@ -25,33 +25,33 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
 
 class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
 {
-    class Node : Node
+    class AVLNode : Node
     {
         
     }
 
-    public override Insert(TKey key, TValue value);
-    public override Delete(TKey key);
+    public override void Insert(TKey key, TValue value);
+    public override void Delete(TKey key);
 }
 
-class RBTree<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : IComparable<TKey>
+class RBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
 {
-    class Node : Node
+    class RBNode : Node
     {
         
     }
 
-    public override Insert(TKey key, TValue value);
-    public override Delete(TKey key);
+    public override void Insert(TKey key, TValue value);
+    public override void Delete(TKey key);
 }
 
 class GenericDicitonary<TKey, TValue>
 {
-    IKeyValuePair structure;
+    IKeyValuePair<TKey, TValue> structure;
 }
 
 class GenericSet<T>
 {
-    IKeyValuePair structure;
+    IKeyValuePair<T, T> structure;
 }
 
