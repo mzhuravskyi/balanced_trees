@@ -11,22 +11,24 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
 {
     protected class Node
     {
-        public Node? right;
         public Node? left;
+        public Node? right;
         public TKey key;
         public TValue value;
 
-        public Node(TKey key, TValue value, Node? right, Node? left)
+        public Node(TKey key, TValue value)
         {
             this.key = key;
             this.value = value;
-            this.right = right;
-            this.left = left;
+            this.left = null;
+            this.right = null;
         }
     }
 
     Node? root = null;
-    int count = 0;
+    protected int count = 0;
+
+    public int Count => count;
 
     public TValue GetValue(TKey key)
     {
@@ -102,7 +104,7 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
     }
     public List<TValue> InOrderValues() {
         Debug.Assert(root != null, "empty tree");
-        List<TValue> keys = new List<TValue>();
+        List<TValue> values = new List<TValue>();
         Stack<Node> stack = new Stack<Node>();
         Node? current = root;
         
@@ -114,11 +116,11 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
                 current = current.left;
             }
             current = stack.Pop();
-            keys.Add(current.value);
+            values.Add(current.value);
             current = current.right;
         }
 
-        return keys;
+        return values;
     }
     public List<(TKey, TValue)> InOrderKVP() {
         Debug.Assert(root != null, "empty tree");
@@ -149,13 +151,79 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
 
 class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
 {
-    class AVLNode : Node
+    protected class AVLNode : Node
+    {
+        public int height;
+
+        public AVLNode(TKey key, TValue value, int height) : base(key, value)
+        {
+            this.height = height;
+        }
+    }
+    void RotationLeft()
     {
         
     }
+    void RotationRight()
+    {
+        
+    }
+    void DoubleRotationLeft()
+    {
+        
+    }
+    void DoubleRotationRight()
+    {
+        
+    }
+    void UpdateHeight(AVLNode node)
+    {
+        node.height = Math.Max((AVLNode) node.right.height, (AVLNode) node.left.height) + 1;
+    }
+    void CheckBalance(AVLNode node)
+    {
+        
+    }
+    void FixHeight()
+    {
+        
+    }
+    AVLNode InsertReal(AVLNode node, TKey key, TValue value)
+    {
+        if (node == null)
+        {
+            count++;
+            return new AVLNode(key, value, 0);
+        }
 
-    public override void Insert(TKey key, TValue value);
-    public override void Delete(TKey key);
+        int a = node.key.CompareTo(key);
+        if (a < 0)
+        {
+            node.right = InsertReal((AVLNode) node.right!, key, value);         // how to avoid typecasting?
+        }
+        else if (a > 0)
+        {
+            node.left = InsertReal((AVLNode) node.left!, key, value);            // typecasting again
+        }
+        else
+        {
+            return node;
+        }
+
+        CheckBalance(node);
+        FixHeight(node);
+
+        return node;
+    }
+
+    public override void Insert(TKey key, TValue value)
+    {
+        
+    }
+    public override void Delete(TKey key)
+    {
+        
+    }
 }
 
 class RBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
