@@ -30,7 +30,7 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
 
     public int Count => count;
 
-    public TValue GetValue(TKey key)
+    public Node FindNode(TKey key)
     {
         Debug.Assert(root != null, "empty tree");
         Node? current = root;
@@ -48,11 +48,18 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
             }
             else
             {
-                return current.value;
+                return current;
             }
         }
 
         throw new KeyNotFoundException($"{key} not found");
+    }
+
+    public TValue GetValue(TKey key)
+    {
+        Node node = FindNode(key);
+        
+        return node.value;
     }
     // public TKey GetNextKey(TKey currentent_key);
     public TValue GetMaxValue(out TKey max_key)
@@ -68,6 +75,7 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
 
         return current.value;
     }
+
     public TValue GetMinValue(out TKey min_key)
     {
         Debug.Assert(root != null, "empty tree");
@@ -81,6 +89,7 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
 
         return current.value;
     }
+
     public List<TKey> InOrderKeys()
     {
         Debug.Assert(root != null, "empty tree");
@@ -102,6 +111,7 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
 
         return keys;
     }
+
     public List<TValue> InOrderValues() {
         Debug.Assert(root != null, "empty tree");
         List<TValue> values = new List<TValue>();
@@ -122,6 +132,7 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
 
         return values;
     }
+
     public List<(TKey, TValue)> InOrderKVP() {
         Debug.Assert(root != null, "empty tree");
         List<(TKey, TValue)> kvps = new List<(TKey, TValue)>();
@@ -158,30 +169,33 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
             this.height = height;
         }
     }
-    AVLNode RotationRight(AVLNode ynode)
+
+    AVLNode RotationLeft(AVLNode ynode)
     {
         AVLNode xnode = (AVLNode) ynode.left!;
 
         ynode.left = xnode.right;
         xnode.right = ynode;
 
-        UpdateHeight(xnode);
         UpdateHeight(ynode);
+        UpdateHeight(xnode);
 
         return xnode;
     }
-    AVLNode RotationLeft(AVLNode ynode)
+
+    AVLNode RotationRight(AVLNode ynode)
     {
         AVLNode xnode = (AVLNode) ynode.right!;
 
         ynode.right = xnode.left;
         xnode.left = ynode;
 
-        UpdateHeight(xnode);
         UpdateHeight(ynode);
+        UpdateHeight(xnode);
 
         return xnode;
     }
+
     AVLNode DoubleRotationLeft(AVLNode znode)
     {
         AVLNode xnode = (AVLNode) znode.left!;
@@ -189,14 +203,16 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
 
         xnode.right = ynode.left;
         znode.left = ynode.right;
+        ynode.left = xnode;
         ynode.right = znode;
 
         UpdateHeight(xnode);
-        UpdateHeight(ynode);
         UpdateHeight(znode);
+        UpdateHeight(ynode);
 
         return ynode;
     }
+
     AVLNode DoubleRotationRight(AVLNode znode)
     {
         AVLNode xnode = (AVLNode) znode.right!;
@@ -205,13 +221,15 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
         xnode.left = ynode.right;
         znode.right = ynode.left;
         ynode.left = znode;
+        ynode.right = xnode;
 
         UpdateHeight(xnode);
-        UpdateHeight(ynode);
         UpdateHeight(znode);
+        UpdateHeight(ynode);
 
         return ynode;
     }
+
     int GetHeight(AVLNode? node)
     {
         return node == null ? -1 : node.height;
@@ -221,10 +239,12 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
     {
         node.height = Math.Max(GetHeight((AVLNode?) node.right), GetHeight((AVLNode?) node.left)) + 1; // ugly typecasting
     }
+
     int  GetBalance(AVLNode node)
     {
         return GetHeight((AVLNode?) node.right) - GetHeight((AVLNode?) node.left);
     }
+
     AVLNode RebalanceHeight(AVLNode node)
     {
         int balance = GetBalance(node);
@@ -235,27 +255,28 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
 
                 if (lnode_balance == -1)
                 {
-                    return RotationRight(node);
-                }
-                else
-                {
-                    return DoubleRotationRight(node);
-                }
-            case 2:
-                int rnode_balance = GetBalance((AVLNode) node.right!);
-                
-                if (rnode_balance == 1)
-                {
                     return RotationLeft(node);
                 }
                 else
                 {
                     return DoubleRotationLeft(node);
                 }
+            case 2:
+                int rnode_balance = GetBalance((AVLNode) node.right!);
+                
+                if (rnode_balance == 1)
+                {
+                    return RotationRight(node);
+                }
+                else
+                {
+                    return DoubleRotationRight(node);
+                }
             default:
                 return node;
         }
     }
+
     AVLNode AVLInsert(AVLNode? node, TKey key, TValue value)
     {
         if (node == null)
@@ -280,13 +301,18 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
 
         UpdateHeight(node);
         return RebalanceHeight(node);
-
     }
+
+    // AVLNode AVLDelete(AVLNode? node, TKey key)
+    // {
+        
+    // }
 
     public override void Insert(TKey key, TValue value)
     {
         root = AVLInsert((AVLNode?) root, key, value);
     }
+
     public override void Delete(TKey key)
     {
         
@@ -320,6 +346,7 @@ class Program
     static void Main()
     {
         AVLTree<int, string> tree = new AVLTree<int, string>();
+        tree.Insert(70, "x");
         tree.Insert(60, "a");
         tree.Insert(50, "b");
         tree.Insert(40, "c");
@@ -329,9 +356,14 @@ class Program
         
         List<(int, string)> kvps = tree.InOrderKVP();
 
+        AVLTree<int, string>.AVLNode root = (AVLTree<int, string>.AVLNode) tree.root!;
+        Console.WriteLine($"count : {tree.Count}  | height : {root.height}");
+        Console.WriteLine($"–––––––––––––––––––––––");
         foreach (var kvp in kvps)
         {
-            Console.WriteLine($"{kvp.Item1} : {kvp.Item2}");
+            Console.WriteLine($"key   : {kvp.Item1} | value  : {kvp.Item2}");
         }
+
+        Console.WriteLine(tree.GetValue(50));
     }
 }
