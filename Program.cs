@@ -61,7 +61,20 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
         
         return node.value;
     }
-    // public TKey GetNextKey(TKey currentent_key);
+
+    public Node InOrderSucc(Node node)                  // helper for a node deletion; doesn't work in general
+    {
+        Node? current = node.right;
+        Debug.Assert(current != null, "no successor");
+
+        while (current.left != null)
+        {
+            current = current.left;
+        }
+
+        return current;
+    }
+
     public TValue GetMaxValue(out TKey max_key)
     {
         Debug.Assert(root != null, "empty tree");
@@ -253,7 +266,7 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
             case -2:
                 int lnode_balance = GetBalance((AVLNode) node.left!);
 
-                if (lnode_balance == -1)
+                if (lnode_balance <= 0)             // 0-case is possible when deleting
                 {
                     return RotationLeft(node);
                 }
@@ -264,7 +277,7 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
             case 2:
                 int rnode_balance = GetBalance((AVLNode) node.right!);
                 
-                if (rnode_balance == 1)
+                if (rnode_balance >= 0)
                 {
                     return RotationRight(node);
                 }
@@ -303,10 +316,41 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
         return RebalanceHeight(node);
     }
 
-    // AVLNode AVLDelete(AVLNode? node, TKey key)
-    // {
-        
-    // }
+    AVLNode? AVLDelete(AVLNode? node, TKey key)
+    {
+        Debug.Assert(node != null, "not in the tree");
+        int a = node.key.CompareTo(key);
+
+        if (a < 0)
+        {
+            node.right = AVLDelete((AVLNode?) node.right, key);
+        }
+        else if (a > 0)
+        {
+            node.left = AVLDelete((AVLNode?) node.left, key);
+        }
+        else
+        {
+            if (node.left == null)
+            {
+                count--;
+                return (AVLNode?) node.right;
+            }
+            if (node.right == null)
+            {
+                count--;
+                return (AVLNode?) node.left;    
+            }
+            
+            AVLNode succ = (AVLNode) InOrderSucc(node);
+            node.key = succ.key;
+            node.value = succ.value;
+            node.right = AVLDelete((AVLNode?) node.right, succ.key);
+        }
+
+        UpdateHeight(node);
+        return RebalanceHeight(node);
+    }
 
     public override void Insert(TKey key, TValue value)
     {
@@ -315,7 +359,7 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
 
     public override void Delete(TKey key)
     {
-        
+        root = AVLDelete((AVLNode?) root, key);
     }
 }
 
@@ -341,7 +385,7 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
 // }
 
 
-class Program
+class Tests
 {
     static void Main()
     {
@@ -363,7 +407,22 @@ class Program
         {
             Console.WriteLine($"key   : {kvp.Item1} | value  : {kvp.Item2}");
         }
+        Console.WriteLine($"key(50) : {tree.GetValue(50)}");
+        Console.WriteLine($"key(30) : {tree.GetValue(30)}");
 
-        Console.WriteLine(tree.GetValue(50));
+        Console.WriteLine($"Deleting...");
+        tree.Delete(30);
+        tree.Delete(10);
+        tree.Delete(50);
+        tree.Delete(40);
+
+        root = (AVLTree<int, string>.AVLNode) tree.root!;
+        kvps = tree.InOrderKVP();
+        Console.WriteLine($"count : {tree.Count}  | height : {root.height}");
+        Console.WriteLine($"–––––––––––––––––––––––");
+        foreach (var kvp in kvps)
+        {
+            Console.WriteLine($"key   : {kvp.Item1} | value  : {kvp.Item2}");
+        }
     }
 }
