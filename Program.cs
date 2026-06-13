@@ -363,16 +363,29 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
     }
 }
 
-// class RBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
-// {
-//     class RBNode : Node
-//     {
-        
-//     }
+class RBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
+{
+    public enum Color {RED, BLACK};
 
-//     public override void Insert(TKey key, TValue value);
-//     public override void Delete(TKey key);
-// }
+    class RBNode : Node
+    {
+        public Color color;
+        
+        public RBNode(TKey key, TValue value, Color color) : base (key, value)
+        {
+            this.color = color;
+        }
+    }
+    
+    public override void Insert(TKey key, TValue value)
+    {
+        
+    }
+    public override void Delete(TKey key)
+    {
+        
+    }
+}
 
 // class GenericDicitonary<TKey, TValue>
 // {
