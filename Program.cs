@@ -363,11 +363,11 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
     }
 }
 
-class RBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
+class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
 {
     public enum Color {RED, BLACK};
 
-    class RBNode : Node
+    public class RBNode : Node
     {
         public Color color;
         
@@ -376,7 +376,22 @@ class RBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
             this.color = color;
         }
     }
-    
+
+    RBNode ColorFlip(RBNode? node)
+    {
+        
+    }
+
+    RBNode RotationLeft(RBNode? node)
+    {
+
+    }
+
+    RBNode RotationRight(RBNode? node)
+    {
+        
+    }
+
     public override void Insert(TKey key, TValue value)
     {
         
