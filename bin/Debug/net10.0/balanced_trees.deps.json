@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "balanced_trees/1.0.0": {
+        "runtime": {
+          "balanced_trees.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "balanced_trees/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

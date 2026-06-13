@@ -9,7 +9,7 @@ interface IKeyValuePair<TKey, TValue>
 
 abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : IComparable<TKey>
 {
-    protected class Node
+    public class Node
     {
         public Node? left;
         public Node? right;
@@ -25,7 +25,7 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
         }
     }
 
-    Node? root = null;
+    public Node? root = null;
     protected int count = 0;
 
     public int Count => count;
@@ -149,7 +149,7 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
 
 class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
 {
-    protected class AVLNode : Node
+    public class AVLNode : Node
     {
         public int height;
 
@@ -164,25 +164,23 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
 
         ynode.left = xnode.right;
         xnode.right = ynode;
-        
+
         UpdateHeight(xnode);
         UpdateHeight(ynode);
 
         return xnode;
-
     }
-    AVLNode RotationLeft(AVLNode xnode)
+    AVLNode RotationLeft(AVLNode ynode)
     {
-        AVLNode ynode = (AVLNode) xnode.left!;
+        AVLNode xnode = (AVLNode) ynode.right!;
 
-        xnode.right = ynode.left;
-        ynode.left = xnode;
+        ynode.right = xnode.left;
+        xnode.left = ynode;
 
         UpdateHeight(xnode);
         UpdateHeight(ynode);
 
-        return ynode;
-
+        return xnode;
     }
     AVLNode DoubleRotationLeft(AVLNode znode)
     {
@@ -198,8 +196,6 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
         UpdateHeight(znode);
 
         return ynode;
-
-        
     }
     AVLNode DoubleRotationRight(AVLNode znode)
     {
@@ -229,11 +225,38 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
     {
         return GetHeight((AVLNode?) node.right) - GetHeight((AVLNode?) node.left);
     }
-    AVLNode FixHeight(int balance)
+    AVLNode RebalanceHeight(AVLNode node)
     {
-        
+        int balance = GetBalance(node);
+        switch (balance)
+        {
+            case -2:
+                int lnode_balance = GetBalance((AVLNode) node.left!);
+
+                if (lnode_balance == -1)
+                {
+                    return RotationRight(node);
+                }
+                else
+                {
+                    return DoubleRotationRight(node);
+                }
+            case 2:
+                int rnode_balance = GetBalance((AVLNode) node.right!);
+                
+                if (rnode_balance == 1)
+                {
+                    return RotationLeft(node);
+                }
+                else
+                {
+                    return DoubleRotationLeft(node);
+                }
+            default:
+                return node;
+        }
     }
-    AVLNode InsertReal(AVLNode? node, TKey key, TValue value)
+    AVLNode AVLInsert(AVLNode? node, TKey key, TValue value)
     {
         if (node == null)
         {
@@ -244,11 +267,11 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
         int a = node.key.CompareTo(key);
         if (a < 0)
         {
-            node.right = InsertReal((AVLNode?) node.right, key, value);         // how to avoid typecasting?
+            node.right = AVLInsert((AVLNode?) node.right, key, value);         // how to avoid typecasting?
         }
         else if (a > 0)
         {
-            node.left = InsertReal((AVLNode?) node.left, key, value);            // typecasting again
+            node.left = AVLInsert((AVLNode?) node.left, key, value);            // typecasting again
         }
         else
         {
@@ -256,14 +279,13 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
         }
 
         UpdateHeight(node);
-        int balance = GetBalance(node);
-        return FixHeight(balance);
+        return RebalanceHeight(node);
 
     }
 
     public override void Insert(TKey key, TValue value)
     {
-        
+        root = AVLInsert((AVLNode?) root, key, value);
     }
     public override void Delete(TKey key)
     {
@@ -271,24 +293,45 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
     }
 }
 
-class RBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
-{
-    class RBNode : Node
-    {
+// class RBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
+// {
+//     class RBNode : Node
+//     {
         
+//     }
+
+//     public override void Insert(TKey key, TValue value);
+//     public override void Delete(TKey key);
+// }
+
+// class GenericDicitonary<TKey, TValue>
+// {
+//     IKeyValuePair<TKey, TValue> structure;
+// }
+
+// class GenericSet<T>
+// {
+//     IKeyValuePair<T, T> structure;
+// }
+
+
+class Program
+{
+    static void Main()
+    {
+        AVLTree<int, string> tree = new AVLTree<int, string>();
+        tree.Insert(60, "a");
+        tree.Insert(50, "b");
+        tree.Insert(40, "c");
+        tree.Insert(30, "a");
+        tree.Insert(20, "b");
+        tree.Insert(10, "c");
+        
+        List<(int, string)> kvps = tree.InOrderKVP();
+
+        foreach (var kvp in kvps)
+        {
+            Console.WriteLine($"{kvp.Item1} : {kvp.Item2}");
+        }
     }
-
-    public override void Insert(TKey key, TValue value);
-    public override void Delete(TKey key);
 }
-
-class GenericDicitonary<TKey, TValue>
-{
-    IKeyValuePair<TKey, TValue> structure;
-}
-
-class GenericSet<T>
-{
-    IKeyValuePair<T, T> structure;
-}
-

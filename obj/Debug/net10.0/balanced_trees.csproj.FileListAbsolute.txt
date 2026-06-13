@@ -1,0 +1,15 @@
+/Users/zhuravskyi/csharp/balanced_trees/bin/Debug/net10.0/balanced_trees
+/Users/zhuravskyi/csharp/balanced_trees/bin/Debug/net10.0/balanced_trees.deps.json
+/Users/zhuravskyi/csharp/balanced_trees/bin/Debug/net10.0/balanced_trees.runtimeconfig.json
+/Users/zhuravskyi/csharp/balanced_trees/bin/Debug/net10.0/balanced_trees.dll
+/Users/zhuravskyi/csharp/balanced_trees/bin/Debug/net10.0/balanced_trees.pdb
+/Users/zhuravskyi/csharp/balanced_trees/obj/Debug/net10.0/balanced_trees.GeneratedMSBuildEditorConfig.editorconfig
+/Users/zhuravskyi/csharp/balanced_trees/obj/Debug/net10.0/balanced_trees.AssemblyInfoInputs.cache
+/Users/zhuravskyi/csharp/balanced_trees/obj/Debug/net10.0/balanced_trees.AssemblyInfo.cs
+/Users/zhuravskyi/csharp/balanced_trees/obj/Debug/net10.0/balanced_trees.csproj.CoreCompileInputs.cache
+/Users/zhuravskyi/csharp/balanced_trees/obj/Debug/net10.0/balanced_trees.sourcelink.json
+/Users/zhuravskyi/csharp/balanced_trees/obj/Debug/net10.0/balanced_trees.dll
+/Users/zhuravskyi/csharp/balanced_trees/obj/Debug/net10.0/refint/balanced_trees.dll
+/Users/zhuravskyi/csharp/balanced_trees/obj/Debug/net10.0/balanced_trees.pdb
+/Users/zhuravskyi/csharp/balanced_trees/obj/Debug/net10.0/balanced_trees.genruntimeconfig.cache
+/Users/zhuravskyi/csharp/balanced_trees/obj/Debug/net10.0/ref/balanced_trees.dll
