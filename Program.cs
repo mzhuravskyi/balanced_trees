@@ -103,49 +103,6 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
         return current.value;
     }
 
-    public List<TKey> InOrderKeys()
-    {
-        Debug.Assert(root != null, "empty tree");
-        List<TKey> keys = new List<TKey>();
-        Stack<Node> stack = new Stack<Node>();
-        Node? current = root;
-
-        while (current != null || stack.Count > 0)
-        {
-            while (current != null)
-            {
-                stack.Push(current);
-                current = current.left;
-            }
-            current = stack.Pop();
-            keys.Add(current.key);
-            current = current.right;
-        }
-
-        return keys;
-    }
-
-    public List<TValue> InOrderValues() {
-        Debug.Assert(root != null, "empty tree");
-        List<TValue> values = new List<TValue>();
-        Stack<Node> stack = new Stack<Node>();
-        Node? current = root;
-        
-        while (current != null || stack.Count > 0)
-        {
-            while (current != null)
-            {
-                stack.Push(current);
-                current = current.left;
-            }
-            current = stack.Pop();
-            values.Add(current.value);
-            current = current.right;
-        }
-
-        return values;
-    }
-
     public List<(TKey, TValue)> InOrderKVP() {
         Debug.Assert(root != null, "empty tree");
         List<(TKey, TValue)> kvps = new List<(TKey, TValue)>();
