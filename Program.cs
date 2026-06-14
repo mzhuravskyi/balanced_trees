@@ -5,6 +5,7 @@ interface IKeyValuePair<TKey, TValue>
     void Insert(TKey key, TValue value);
     void Delete(TKey key);
     TValue GetValue(TKey key);
+    List<(TKey, TValue)> InOrderKVP();
 }
 
 abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : IComparable<TKey>
@@ -474,6 +475,7 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
         {
             node = MoveRedLeft(node);
         }
+
         node.left = RBDeleteMin((RBNode) node.left!);
         return FixUp(node);
     }
@@ -485,7 +487,7 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
         int a = node.key.CompareTo(key);
         if (a > 0)
         {
-            if (node.left != null && GetColor((RBNode?) node.left) == Color.BLACK && GetColor((RBNode?) node.left.left) == Color.BLACK)     // removed && node.left.left != null. Fixed by ai, diverges from book here!!!
+            if (node.left != null && GetColor((RBNode?) node.left) == Color.BLACK && GetColor((RBNode?) node.left.left) == Color.BLACK)     // removed && node.left.left != null. Fixed by ai, diverges from the book here!!!
             {
                 node = MoveRedLeft(node);
             }
@@ -549,13 +551,77 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
 class GenericDicitonary<TKey, TValue>
 {
     IKeyValuePair<TKey, TValue> structure;
+
+    public GenericDicitonary(IKeyValuePair<TKey, TValue> structure)
+    {
+        this.structure = structure;
+    }
+
+    public TValue GetValue(TKey key)
+    {
+        return structure.GetValue(key);
+    }
+
+    public void Add(TKey key, TValue value)
+    {
+        structure.Insert(key, value);
+    }
+
+    public void Remove(TKey key)
+    {
+        structure.Delete(key);
+    }
+
+    public List<(TKey, TValue)> GetKVPs()
+    {
+        return structure.InOrderKVP();
+    }
 }
 
 class GenericSet<T>
 {
     IKeyValuePair<T, T> structure;
-}
 
+    public GenericSet(IKeyValuePair<T, T> structure)
+    {
+        this.structure = structure;
+    }
+
+    public bool Contains(T value)
+    {
+        try
+        {
+            structure.GetValue(value);
+            return true;
+        } catch (KeyNotFoundException)
+        {
+            return false;
+        }
+    } 
+
+    public void Add(T value)
+    {
+        structure.Insert(value, value);
+    }
+
+    public void Remove(T value)
+    {
+        structure.Delete(value);
+    }
+
+    public List<T> GetValues()
+    {
+        List<(T, T)> list = structure.InOrderKVP();
+        List<T> values = new List<T>();
+
+        foreach (var kvp in list)
+        {
+            values.Add(kvp.Item1);
+        }
+
+        return values;
+    }
+}
 
 class Tests
 {
@@ -570,18 +636,20 @@ class Tests
         avl_tree.Insert(20, "b");
         avl_tree.Insert(10, "c");
         
-        List<(int, string)> avl_kvps = avl_tree.InOrderKVP();
-
         AVLTree<int, string>.AVLNode root = (AVLTree<int, string>.AVLNode) avl_tree.root!;
         Console.WriteLine($"count : {avl_tree.Count}  | height : {root.height}");
         Console.WriteLine($"–––––––––––––––––––––––");
-        foreach (var kvp in avl_kvps)
+        foreach (var kvp in avl_tree.InOrderKVP())
         {
             Console.WriteLine($"key   : {kvp.Item1} | value  : {kvp.Item2}");
         }
+
+        Console.WriteLine();
+        Console.WriteLine("Trying to get values...");
         Console.WriteLine($"key(50) : {avl_tree.GetValue(50)}");
         Console.WriteLine($"key(30) : {avl_tree.GetValue(30)}");
 
+        Console.WriteLine();
         Console.WriteLine($"Deleting...");
         avl_tree.Delete(30);
         avl_tree.Delete(10);
@@ -589,15 +657,14 @@ class Tests
         avl_tree.Delete(40);
 
         root = (AVLTree<int, string>.AVLNode) avl_tree.root!;
-        avl_kvps = avl_tree.InOrderKVP();
         Console.WriteLine($"count : {avl_tree.Count}  | height : {root.height}");
         Console.WriteLine($"–––––––––––––––––––––––");
-        foreach (var kvp in avl_kvps)
+        foreach (var kvp in avl_tree.InOrderKVP())
         {
             Console.WriteLine($"key   : {kvp.Item1} | value  : {kvp.Item2}");
         }
 
-        Console.WriteLine("\n");
+        Console.WriteLine();
         LLRBTree<int,string> rb_tree = new LLRBTree<int, string>();
         rb_tree.Insert(50, "x");
         rb_tree.Insert(20, "a");
@@ -607,17 +674,51 @@ class Tests
         rb_tree.Insert(10, "b");
         rb_tree.Insert(60, "c");
 
+        Console.WriteLine();
         List<LLRBTree<int, string>.RBNode> list = new List<LLRBTree<int, string>.RBNode>();
         foreach(var node in rb_tree.PreOrderNodes((LLRBTree<int, string>.RBNode?) rb_tree.root, list))
         {
             Console.WriteLine($"{node.key} : {node.value} : {node.color}");
         }
+
+        Console.WriteLine();
         Console.WriteLine($"Deleting...");
         rb_tree.Delete(40);
+
         list = new List<LLRBTree<int, string>.RBNode>();
         foreach(var node in rb_tree.PreOrderNodes((LLRBTree<int, string>.RBNode?) rb_tree.root, list))
         {
             Console.WriteLine($"{node.key} : {node.value} : {node.color}");
+        }
+
+        Console.WriteLine();
+        AVLTree<string, int> structure = new AVLTree<string, int>();
+        GenericDicitonary<string, int> dict = new GenericDicitonary<string, int>(structure);
+        dict.Add("apple", 1);
+        dict.Add("banana", 10);
+        dict.Add("orange", 1000);
+        dict.Add("cherry", 10);
+        dict.Add("melon", 8);
+        dict.Add("cucumber", -5);
+
+        foreach (var kvp in dict.GetKVPs())
+        {
+            Console.WriteLine($"{kvp.Item1} : {kvp.Item2}");
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("Trying to get values...");
+        Console.WriteLine($"key(orange) : {dict.GetValue("orange")}");
+        Console.WriteLine($"key(cucumber) : {dict.GetValue("cucumber")}");
+        // Console.WriteLine($"key(gibberish) : {dict.GetValue("gibberish")}");
+
+        Console.WriteLine();
+        Console.WriteLine($"Deleting...");
+        dict.Remove("orange");
+        dict.Remove("cucumber");
+        foreach (var kvp in dict.GetKVPs())
+        {
+            Console.WriteLine($"{kvp.Item1} : {kvp.Item2}");
         }
     }
 }
