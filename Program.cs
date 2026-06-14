@@ -443,7 +443,7 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
 
         if (GetColor((RBNode?) node.right!.left) == Color.RED)
         {
-            node = RotationRight((RBNode) node.right);
+            node.right = RotationRight((RBNode) node.right);
             node = RotationLeft(node);
             node = ColorFlip(node);
         }
@@ -485,7 +485,7 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
         int a = node.key.CompareTo(key);
         if (a > 0)
         {
-            if (node.left != null && node.left.left != null && GetColor((RBNode?) node.left) == Color.BLACK && GetColor((RBNode?) node.left.left) == Color.BLACK)
+            if (node.left != null && GetColor((RBNode?) node.left) == Color.BLACK && GetColor((RBNode?) node.left.left) == Color.BLACK)     // removed && node.left.left != null. Fixed by ai, diverges from book here!!!
             {
                 node = MoveRedLeft(node);
             }
@@ -501,7 +501,7 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
             {
                 return null;
             }
-            if (node.right != null && node.right.left != null && GetColor((RBNode?) node.right) == Color.BLACK && GetColor((RBNode?) node.right.left) == Color.BLACK)
+            if (node.right != null && GetColor((RBNode?) node.right) == Color.BLACK && GetColor((RBNode?) node.right.left) == Color.BLACK) // also removed
             {
                 node = MoveRedRight(node);
             }
@@ -546,15 +546,15 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
     }
 }
 
-// class GenericDicitonary<TKey, TValue>
-// {
-//     IKeyValuePair<TKey, TValue> structure;
-// }
+class GenericDicitonary<TKey, TValue>
+{
+    IKeyValuePair<TKey, TValue> structure;
+}
 
-// class GenericSet<T>
-// {
-//     IKeyValuePair<T, T> structure;
-// }
+class GenericSet<T>
+{
+    IKeyValuePair<T, T> structure;
+}
 
 
 class Tests
