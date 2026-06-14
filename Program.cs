@@ -89,7 +89,7 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
         return current.value;
     }
 
-    public TValue GetMinValue(out TKey min_key)
+    public TValue GetMinValue(Node? root, out TKey min_key)
     {
         Debug.Assert(root != null, "empty tree");
         Node current = root;
@@ -336,12 +336,21 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
 
     RBNode ColorFlip(RBNode ynode)
     {
-        RBNode xnode = (RBNode) ynode.left!;
-        RBNode znode = (RBNode) ynode.right!;
+        RBNode xnode = (RBNode?) ynode.left!;
+        RBNode znode = (RBNode?) ynode.right!;
 
-        xnode.color = Color.BLACK;
-        znode.color = Color.BLACK;
-        ynode.color = Color.RED;
+        if (ynode.color == Color.BLACK)
+        {
+            xnode.color = Color.BLACK;
+            znode.color = Color.BLACK;
+            ynode.color = Color.RED;
+        }
+        else
+        {
+            xnode.color = Color.RED;
+            znode.color = Color.RED;
+            ynode.color = Color.BLACK;
+        }
 
         return ynode;
     }
@@ -390,7 +399,6 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
         {
             ynode = RotationLeft(ynode);
         }
-
         if (GetColor((RBNode?) ynode.left) == Color.RED && GetColor((RBNode?) ynode.left!.left) == Color.RED)
         {
             ynode = RotationRight(ynode);    
@@ -429,6 +437,90 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
         return FixUp(node);
     }
 
+    RBNode MoveRedLeft(RBNode node)
+    {
+        ColorFlip(node);
+
+        if (GetColor((RBNode?) node.right!.left) == Color.RED)
+        {
+            node = RotationRight((RBNode) node.right);
+            node = RotationLeft(node);
+            node = ColorFlip(node);
+        }
+
+        return node;
+    }
+
+    RBNode MoveRedRight(RBNode node)
+    {
+        node = ColorFlip(node);
+        if (GetColor((RBNode?) node.left!.left) == Color.RED)
+        {
+            node = RotationRight(node);
+            node = ColorFlip(node);
+        }
+
+        return node;
+    }
+
+    RBNode? RBDeleteMin(RBNode node)
+    {
+        if (node.left == null)
+        {
+            return null;
+        }
+        
+        if (GetColor((RBNode?) node.left) == Color.BLACK && GetColor((RBNode?) node.left.left) == Color.BLACK)
+        {
+            node = MoveRedLeft(node);
+        }
+        node.left = RBDeleteMin((RBNode) node.left!);
+        return FixUp(node);
+    }
+
+    RBNode? RBDelete(RBNode? node, TKey key)
+    {
+        Debug.Assert(node != null, "not in the tree");
+
+        int a = node.key.CompareTo(key);
+        if (a > 0)
+        {
+            if (node.left != null && node.left.left != null && GetColor((RBNode?) node.left) == Color.BLACK && GetColor((RBNode?) node.left.left) == Color.BLACK)
+            {
+                node = MoveRedLeft(node);
+            }
+            node.left = RBDelete((RBNode?) node.left, key);
+        }
+        else
+        {
+            if (GetColor((RBNode?) node.left) == Color.RED)
+            {
+                node = RotationRight(node);
+            }
+            if (node.key.Equals(key) && node.right == null)
+            {
+                return null;
+            }
+            if (node.right != null && node.right.left != null && GetColor((RBNode?) node.right) == Color.BLACK && GetColor((RBNode?) node.right.left) == Color.BLACK)
+            {
+                node = MoveRedRight(node);
+            }
+            if (node.key.Equals(key))
+            {
+                node.value = GetMinValue(node.right, out TKey min_key);
+                node.key = min_key;
+                node.right = RBDeleteMin((RBNode) node.right!);
+            }
+            else
+            {
+                node.right = RBDelete((RBNode) node.right!, key);
+            }
+        }
+        node = FixUp(node);
+        return node;
+    }
+
+
     public List<RBNode> PreOrderNodes(RBNode? node, List<RBNode> list)
     {
         if (node == null)
@@ -450,7 +542,7 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
     }
     public override void Delete(TKey key)
     {
-        
+        root = RBDelete((RBNode?) root, key);
     }
 }
 
@@ -493,7 +585,7 @@ class Tests
         Console.WriteLine($"Deleting...");
         avl_tree.Delete(30);
         avl_tree.Delete(10);
-        avl_tree.Delete(50);
+        avl_tree.Delete(20);
         avl_tree.Delete(40);
 
         root = (AVLTree<int, string>.AVLNode) avl_tree.root!;
@@ -516,6 +608,13 @@ class Tests
         rb_tree.Insert(60, "c");
 
         List<LLRBTree<int, string>.RBNode> list = new List<LLRBTree<int, string>.RBNode>();
+        foreach(var node in rb_tree.PreOrderNodes((LLRBTree<int, string>.RBNode?) rb_tree.root, list))
+        {
+            Console.WriteLine($"{node.key} : {node.value} : {node.color}");
+        }
+        Console.WriteLine($"Deleting...");
+        rb_tree.Delete(40);
+        list = new List<LLRBTree<int, string>.RBNode>();
         foreach(var node in rb_tree.PreOrderNodes((LLRBTree<int, string>.RBNode?) rb_tree.root, list))
         {
             Console.WriteLine($"{node.key} : {node.value} : {node.color}");
