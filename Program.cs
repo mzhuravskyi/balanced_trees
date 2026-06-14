@@ -720,5 +720,27 @@ class Tests
         {
             Console.WriteLine($"{kvp.Item1} : {kvp.Item2}");
         }
+
+        Console.WriteLine();
+        LLRBTree<int, int> nstructure = new LLRBTree<int, int>();
+        GenericSet<int> set = new GenericSet<int>(nstructure);
+        set.Add(10);
+        set.Add(-10);
+        set.Add(0);
+        set.Add(20);
+        set.Add(1000);
+        set.Add(15);
+        set.Add(-10000);
+
+        foreach (var val in set.GetValues())
+        {
+            Console.WriteLine(val);
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("Testing Constains()");
+        Console.WriteLine($"2 : {set.Contains(2)}");
+        Console.WriteLine($"0 : {set.Contains(0)}");
+        Console.WriteLine($"1 : {set.Contains(1)}");
     }
 }
