@@ -377,24 +377,119 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
         }
     }
 
-    RBNode ColorFlip(RBNode? node)
+    RBNode ColorFlip(RBNode ynode)
     {
-        
+        RBNode xnode = (RBNode) ynode.left!;
+        RBNode znode = (RBNode) ynode.right!;
+
+        xnode.color = Color.BLACK;
+        znode.color = Color.BLACK;
+        ynode.color = Color.RED;
+
+        return ynode;
     }
 
-    RBNode RotationLeft(RBNode? node)
+    RBNode RotationLeft(RBNode xnode)
     {
+        RBNode ynode = (RBNode) xnode.right!;
 
+        xnode.right = ynode.left;
+        ynode.left = xnode;
+
+        ynode.color = xnode.color;
+        xnode.color = Color.RED;
+
+        return ynode; 
     }
 
-    RBNode RotationRight(RBNode? node)
+    RBNode RotationRight(RBNode ynode)
     {
-        
+        RBNode xnode = (RBNode) ynode.left!;
+
+        ynode.left = xnode.right;
+        xnode.right = ynode;
+
+        xnode.color = ynode.color;
+        ynode.color = Color.RED;
+
+        return xnode;
+    }
+
+    Color GetColor(RBNode? node)
+    {
+        if (node == null || node.color == Color.BLACK)
+        {
+            return Color.BLACK;
+        }
+        else
+        {
+            return Color.RED;
+        }
+    }
+
+    RBNode FixUp(RBNode ynode)
+    {
+        if (GetColor((RBNode?) ynode.left) == Color.BLACK && GetColor((RBNode?) ynode.right) == Color.RED)
+        {
+            ynode = RotationLeft(ynode);
+        }
+
+        if (GetColor((RBNode?) ynode.left) == Color.RED && GetColor((RBNode?) ynode.left!.left) == Color.RED)
+        {
+            ynode = RotationRight(ynode);    
+        }
+
+        if (GetColor((RBNode?) ynode.left) == Color.RED && GetColor((RBNode?) ynode.right) == Color.RED)
+        {
+            ynode = ColorFlip(ynode);
+        }
+
+        return ynode;
+    }
+
+    RBNode RBInsert(RBNode? node, TKey key, TValue value)
+    {
+        if (node == null)
+        {
+            count++;
+            return new RBNode(key, value, Color.RED);
+        }
+
+        int a = node.key.CompareTo(key);
+        if (a < 0)
+        {
+            node.right = RBInsert((RBNode?) node.right, key, value);
+        }
+        else if (a > 0)
+        {
+            node.left = RBInsert((RBNode?) node.left, key, value);
+        }
+        else
+        {
+            return node;
+        }
+
+        return FixUp(node);
+    }
+
+    public List<RBNode> PreOrderNodes(RBNode? node, List<RBNode> list)
+    {
+        if (node == null)
+        {
+            return list;
+        }
+
+        list.Add(node);
+        PreOrderNodes((RBNode?) node.left, list);
+        PreOrderNodes((RBNode?) node.right, list);
+
+        return list;
     }
 
     public override void Insert(TKey key, TValue value)
     {
-        
+        root = RBInsert((RBNode?) root, key, value);
+        ((RBNode) root).color = Color.BLACK;
     }
     public override void Delete(TKey key)
     {
@@ -417,40 +512,56 @@ class Tests
 {
     static void Main()
     {
-        AVLTree<int, string> tree = new AVLTree<int, string>();
-        tree.Insert(70, "x");
-        tree.Insert(60, "a");
-        tree.Insert(50, "b");
-        tree.Insert(40, "c");
-        tree.Insert(30, "a");
-        tree.Insert(20, "b");
-        tree.Insert(10, "c");
+        AVLTree<int, string> avl_tree = new AVLTree<int, string>();
+        avl_tree.Insert(70, "x");
+        avl_tree.Insert(60, "a");
+        avl_tree.Insert(50, "b");
+        avl_tree.Insert(40, "c");
+        avl_tree.Insert(30, "a");
+        avl_tree.Insert(20, "b");
+        avl_tree.Insert(10, "c");
         
-        List<(int, string)> kvps = tree.InOrderKVP();
+        List<(int, string)> avl_kvps = avl_tree.InOrderKVP();
 
-        AVLTree<int, string>.AVLNode root = (AVLTree<int, string>.AVLNode) tree.root!;
-        Console.WriteLine($"count : {tree.Count}  | height : {root.height}");
+        AVLTree<int, string>.AVLNode root = (AVLTree<int, string>.AVLNode) avl_tree.root!;
+        Console.WriteLine($"count : {avl_tree.Count}  | height : {root.height}");
         Console.WriteLine($"–––––––––––––––––––––––");
-        foreach (var kvp in kvps)
+        foreach (var kvp in avl_kvps)
         {
             Console.WriteLine($"key   : {kvp.Item1} | value  : {kvp.Item2}");
         }
-        Console.WriteLine($"key(50) : {tree.GetValue(50)}");
-        Console.WriteLine($"key(30) : {tree.GetValue(30)}");
+        Console.WriteLine($"key(50) : {avl_tree.GetValue(50)}");
+        Console.WriteLine($"key(30) : {avl_tree.GetValue(30)}");
 
         Console.WriteLine($"Deleting...");
-        tree.Delete(30);
-        tree.Delete(10);
-        tree.Delete(50);
-        tree.Delete(40);
+        avl_tree.Delete(30);
+        avl_tree.Delete(10);
+        avl_tree.Delete(50);
+        avl_tree.Delete(40);
 
-        root = (AVLTree<int, string>.AVLNode) tree.root!;
-        kvps = tree.InOrderKVP();
-        Console.WriteLine($"count : {tree.Count}  | height : {root.height}");
+        root = (AVLTree<int, string>.AVLNode) avl_tree.root!;
+        avl_kvps = avl_tree.InOrderKVP();
+        Console.WriteLine($"count : {avl_tree.Count}  | height : {root.height}");
         Console.WriteLine($"–––––––––––––––––––––––");
-        foreach (var kvp in kvps)
+        foreach (var kvp in avl_kvps)
         {
             Console.WriteLine($"key   : {kvp.Item1} | value  : {kvp.Item2}");
+        }
+
+        Console.WriteLine("\n");
+        LLRBTree<int,string> rb_tree = new LLRBTree<int, string>();
+        rb_tree.Insert(50, "x");
+        rb_tree.Insert(20, "a");
+        rb_tree.Insert(70, "b");
+        rb_tree.Insert(30, "c");
+        rb_tree.Insert(40, "a");
+        rb_tree.Insert(10, "b");
+        rb_tree.Insert(60, "c");
+
+        List<LLRBTree<int, string>.RBNode> list = new List<LLRBTree<int, string>.RBNode>();
+        foreach(var node in rb_tree.PreOrderNodes((LLRBTree<int, string>.RBNode?) rb_tree.root, list))
+        {
+            Console.WriteLine($"{node.key} : {node.value} : {node.color}");
         }
     }
 }
