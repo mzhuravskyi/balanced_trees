@@ -5,7 +5,7 @@ interface IKeyValuePair<TKey, TValue>
     void Insert(TKey key, TValue value);
     void Delete(TKey key);
     TValue GetValue(TKey key);
-    List<(TKey, TValue)> InOrderKVP();
+    List<(TKey key, TValue value)> InOrderKVP();
 }
 
 abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : IComparable<TKey>
@@ -26,12 +26,12 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
         }
     }
 
-    public Node? root = null;
+    protected Node? root = null;
     protected int count = 0;
 
     public int Count => count;
 
-    public Node FindNode(TKey key)
+    protected Node FindNode(TKey key)
     {
         Debug.Assert(root != null, "empty tree");
         Node? current = root;
@@ -63,7 +63,7 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
         return node.value;
     }
 
-    public Node InOrderSucc(Node node)                  // helper for a node deletion; doesn't work in general
+    protected Node InOrderSucc(Node node)                  // helper for a node deletion; doesn't work in general
     {
         Node? current = node.right;
         Debug.Assert(current != null, "no successor");
@@ -104,7 +104,7 @@ abstract class BST<TKey, TValue> : IKeyValuePair<TKey, TValue> where TKey : ICom
         return current.value;
     }
 
-    public List<(TKey, TValue)> InOrderKVP() {
+    public List<(TKey key, TValue value)> InOrderKVP() {
         Debug.Assert(root != null, "empty tree");
         List<(TKey, TValue)> kvps = new List<(TKey, TValue)>();
         Stack<Node> stack = new Stack<Node>();
@@ -140,6 +140,8 @@ class AVLTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
             this.height = height;
         }
     }
+
+    public int Height => GetHeight((AVLNode?) root);
 
     AVLNode RotationLeft(AVLNode ynode)
     {
@@ -522,17 +524,35 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
         return node;
     }
 
-
-    public List<RBNode> PreOrderNodes(RBNode? node, List<RBNode> list)
+    public List<(TKey key, TValue value, Color color)> PreOrderKVP()
     {
-        if (node == null)
-        {
-            return list;
-        }
+        List<RBNode> nodes = PreOrderNodes((RBNode?) root);
+        List<(TKey, TValue, Color)> tuples = new();
 
-        list.Add(node);
-        PreOrderNodes((RBNode?) node.left, list);
-        PreOrderNodes((RBNode?) node.right, list);
+        foreach (RBNode node in nodes)
+        {
+            tuples.Add((node.key, node.value, node.color));
+        }
+        
+        return tuples;
+    }
+
+    List<RBNode> PreOrderNodes(RBNode? node)
+    {
+        List<RBNode> list = new();
+        helper(node);
+
+        void helper(RBNode? node)
+        {
+            if (node == null)
+            {
+                return;
+            }
+
+            list.Add(node);
+            helper((RBNode?) node.left);
+            helper((RBNode?) node.right);
+        }
 
         return list;
     }
@@ -572,7 +592,7 @@ class GenericDicitonary<TKey, TValue>
         structure.Delete(key);
     }
 
-    public List<(TKey, TValue)> GetKVPs()
+    public List<(TKey key, TValue value)> GetKVPs()
     {
         return structure.InOrderKVP();
     }
@@ -636,12 +656,11 @@ class Tests
         avl_tree.Insert(20, "b");
         avl_tree.Insert(10, "c");
         
-        AVLTree<int, string>.AVLNode root = (AVLTree<int, string>.AVLNode) avl_tree.root!;
-        Console.WriteLine($"count : {avl_tree.Count}  | height : {root.height}");
+        Console.WriteLine($"count : {avl_tree.Count}  | height : {avl_tree.Height}");
         Console.WriteLine($"–––––––––––––––––––––––");
         foreach (var kvp in avl_tree.InOrderKVP())
         {
-            Console.WriteLine($"key   : {kvp.Item1} | value  : {kvp.Item2}");
+            Console.WriteLine($"key   : {kvp.key} | value  : {kvp.value}");
         }
 
         Console.WriteLine();
@@ -656,12 +675,11 @@ class Tests
         avl_tree.Delete(20);
         avl_tree.Delete(40);
 
-        root = (AVLTree<int, string>.AVLNode) avl_tree.root!;
-        Console.WriteLine($"count : {avl_tree.Count}  | height : {root.height}");
+        Console.WriteLine($"count : {avl_tree.Count}  | height : {avl_tree.Height}");
         Console.WriteLine($"–––––––––––––––––––––––");
         foreach (var kvp in avl_tree.InOrderKVP())
         {
-            Console.WriteLine($"key   : {kvp.Item1} | value  : {kvp.Item2}");
+            Console.WriteLine($"key   : {kvp.key} | value  : {kvp.value}");
         }
 
         Console.WriteLine();
@@ -675,20 +693,18 @@ class Tests
         rb_tree.Insert(60, "c");
 
         Console.WriteLine();
-        List<LLRBTree<int, string>.RBNode> list = new List<LLRBTree<int, string>.RBNode>();
-        foreach(var node in rb_tree.PreOrderNodes((LLRBTree<int, string>.RBNode?) rb_tree.root, list))
+        foreach(var tuple in rb_tree.PreOrderKVP())
         {
-            Console.WriteLine($"{node.key} : {node.value} : {node.color}");
+            Console.WriteLine($"{tuple.key} : {tuple.value} : {tuple.color}");
         }
 
         Console.WriteLine();
         Console.WriteLine($"Deleting...");
         rb_tree.Delete(40);
 
-        list = new List<LLRBTree<int, string>.RBNode>();
-        foreach(var node in rb_tree.PreOrderNodes((LLRBTree<int, string>.RBNode?) rb_tree.root, list))
+        foreach(var tuple in rb_tree.PreOrderKVP())
         {
-            Console.WriteLine($"{node.key} : {node.value} : {node.color}");
+            Console.WriteLine($"{tuple.key} : {tuple.value} : {tuple.color}");
         }
 
         Console.WriteLine();
@@ -703,7 +719,7 @@ class Tests
 
         foreach (var kvp in dict.GetKVPs())
         {
-            Console.WriteLine($"{kvp.Item1} : {kvp.Item2}");
+            Console.WriteLine($"{kvp.key} : {kvp.value}");
         }
 
         Console.WriteLine();
@@ -718,7 +734,7 @@ class Tests
         dict.Remove("cucumber");
         foreach (var kvp in dict.GetKVPs())
         {
-            Console.WriteLine($"{kvp.Item1} : {kvp.Item2}");
+            Console.WriteLine($"{kvp.key} : {kvp.value}");
         }
 
         Console.WriteLine();
