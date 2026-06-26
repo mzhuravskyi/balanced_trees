@@ -1,1 +1,28 @@
-boilerplate
+AVL/RB-trees in C# OOP style.
+
+Description:
+This project provides a scalable, ground-up implementation of self-balancing search trees in C#.
+It features AVL and Left-Leaning-Red-Black trees that guarantee O(logn) time complexity of insertions/deletions/lookups.
+
+Additionally, the proejct includes standard higher-level library collections (Dictionary and Set) that utilize balanced trees, 
+however can be easily reinitialzied to use any other data-structure thanks to the generic design.
+
+Goal:
+The goal of the project was to put theory into practice and to explore C# OOP structures.
+
+Implementations:
+    BST-Tree: a generic abstract base class that handles basic binary trees operations;
+
+    AVL-Tree: a standard balanced AVL Tree that maintains height invariant via single/double rotations. Height updates are propagated to the root of the tree, which allows to cut several corner-cases, although sacrifacing a bit of perfomance compared to the signal implementation;
+
+    LLRB-Tree: a standard textbook variant of a more general Red-Black tree, which, however, maintains all its complexity analysis;
+
+    Generic-Dictionary: a key-value map, can be injected with arbitary data-structure that satisfies IKeyValuePair interface;
+
+    Generic-Set: a collection of unique elements, can be injected with arbitary data-structure that satisfies IKeyValuePair interface;
+
+Major issues:
+Multiple node casts e.g: Node into RBNode, Node into AVLNode and vice-versa stands-out from OOP design paradigm and potentially also halts efficiency.
+
+Usage:
+Tests class provides basic usage examples.
