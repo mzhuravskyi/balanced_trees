@@ -4,8 +4,7 @@ Description:
 This project provides a scalable, ground-up implementation of self-balancing search trees in C#.
 It features AVL and Left-Leaning-Red-Black trees that guarantee O(logn) time complexity of insertions/deletions/lookups.
 
-Additionally, the proejct includes standard higher-level library collections (Dictionary and Set) that utilize balanced trees, 
-however can be easily reinitialzied to use any other data-structure thanks to the generic design.
+Additionally, the proejct includes standard higher-level library collections (Dictionary and Set) that utilize balanced trees, however can be easily reinitialzied to use any other data-structure thanks to the generic design.
 
 Goal:
 The goal of the project was to put theory into practice and to explore C# OOP structures.
