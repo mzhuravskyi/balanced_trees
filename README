@@ -12,7 +12,7 @@ The goal of the project was to put theory into practice and to explore C# OOP st
 Implementations:
     BST-Tree: a generic abstract base class that handles basic binary trees operations;
 
-    AVL-Tree: a standard balanced AVL Tree that maintains height invariant via single/double rotations. Height updates are propagated to the root of the tree, which allows to cut several corner-cases, although sacrifacing a bit of perfomance compared to the signal implementation;
+    AVL-Tree: a standard balanced AVL Tree that maintains height invariant via single/double rotations. Height updates are propagated to        the root of the tree, which allows to cut several corner-cases, although sacrifacing a bit of perfomance compared to the signal             implementation;
 
     LLRB-Tree: a standard textbook variant of a more general Red-Black tree, which, however, maintains all its complexity analysis;
 
