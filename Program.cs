@@ -633,12 +633,12 @@ class GenericSet<T>
 
     public List<T> GetValues()
     {
-        List<(T, T)> list = structure.InOrderKVP();
+        List<(T key, T value)> list = structure.InOrderKVP();
         List<T> values = new List<T>();
 
         foreach (var kvp in list)
         {
-            values.Add(kvp.Item1);
+            values.Add(kvp.value);
         }
 
         return values;
