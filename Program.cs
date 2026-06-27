@@ -503,6 +503,7 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
             }
             if (node.key.Equals(key) && node.right == null)
             {
+                count--;
                 return null;
             }
             if (node.right != null && GetColor((RBNode?) node.right) == Color.BLACK && GetColor((RBNode?) node.right.left) == Color.BLACK) // also removed
@@ -514,6 +515,7 @@ class LLRBTree<TKey, TValue> : BST<TKey, TValue> where TKey : IComparable<TKey>
                 node.value = GetMinValue(node.right, out TKey min_key);
                 node.key = min_key;
                 node.right = RBDeleteMin((RBNode) node.right!);
+                count--;
             }
             else
             {
@@ -697,6 +699,7 @@ class Tests
         {
             Console.WriteLine($"{tuple.key} : {tuple.value} : {tuple.color}");
         }
+        Console.WriteLine($"count = {rb_tree.Count}");
 
         Console.WriteLine();
         Console.WriteLine($"Deleting...");
@@ -706,6 +709,7 @@ class Tests
         {
             Console.WriteLine($"{tuple.key} : {tuple.value} : {tuple.color}");
         }
+        Console.WriteLine($"count = {rb_tree.Count}");
 
         Console.WriteLine();
         AVLTree<string, int> structure = new AVLTree<string, int>();
